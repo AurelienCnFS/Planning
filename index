@@ -51,6 +51,7 @@
                 // Remplir l'objet events avec les données de la feuille
                 for (let i = 1; i < data.values.length; i++) {
                     const [date, text] = data.values[i];
+                    console.log(`Date: ${date}, Texte: ${text}`); // Débogage
                     events[date] = text; // Utiliser la date comme clé
                 }
             } else {
@@ -92,7 +93,8 @@
         }
 
         function selectDate(year, month, day) {
-            const selectedDate = `${day}/${month + 1}/${year}`; // Format JJ/MM/AAAA
+            // Formater la date pour correspondre au format JJ/MM/AAAA
+            const selectedDate = `${day < 10 ? '0' + day : day}/${(month + 1) < 10 ? '0' + (month + 1) : (month + 1)}/${year}`; 
             const text = events[selectedDate] || 'Aucun texte associé pour cette date.'; // Récupérer le texte associé
             document.getElementById('selectedText').textContent = text;
             highlightSelectedDay(day);
