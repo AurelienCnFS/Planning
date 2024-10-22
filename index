@@ -37,8 +37,8 @@
     <p id="selectedText"></p>
 
     <script>
-        const sheetId = '1Y4zpeQJgkalrj32uYIF613sT-Nox5SHzXCduXCFEFTw'; // ID de ta feuille
-        const apiKey = '1i9L8f83fnMzIFUVoTJlPtGbylm3Lf8Md7Ph7LkC74nA'; // Ta clé API
+        const sheetId = '1i9L8f83fnMzIFUVoTJlPtGbylm3Lf8Md7Ph7LkC74nA'; // Nouvel ID de ta feuille
+        const apiKey = 'AIzaSyDMdpfkeyCNGeR24WJPiNBj__E64kPrKhE'; // Nouvelle clé API
         const range = 'Feuille1!A:B'; // Modifie si nécessaire
 
         let events = {}; // Objet pour stocker les événements
@@ -52,7 +52,6 @@
                     // Remplir l'objet events avec les données de la feuille
                     for (let i = 1; i < data.values.length; i++) {
                         const [date, text] = data.values[i];
-                        console.log(`Date: ${date}, Texte: ${text}`); // Débogage
                         events[date] = text; // Utiliser la date comme clé
                     }
                 } else {
