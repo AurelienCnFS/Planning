@@ -11,6 +11,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            margin: 20px;
         }
         table {
             border-collapse: collapse;
@@ -54,12 +55,13 @@
         // Remplacez ces valeurs par votre ID de feuille et clé API
         const SHEET_ID = '1i9L8f83fnMzIFUVoTJlPtGbylm3Lf8Md7Ph7LkC74nA';
         const API_KEY = 'AIzaSyBYM19vbTPAi49sXzjqPJsFzhRsZHVKql8';
+        const SHEET_NAME = 'NomDeVotreFeuille'; // Remplacez par le nom de votre feuille
 
         // Fonction pour récupérer les données de Google Sheets
         async function fetchSheetData() {
-            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/NomDeVotreFeuille?key=${API_KEY}`);
+            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`);
             const data = await response.json();
-            return data.values;
+            return data.values || []; // Retourne un tableau vide si aucune donnée n'est trouvée
         }
 
         // Fonction pour construire le calendrier du mois courant
@@ -96,9 +98,9 @@
             const data = await fetchSheetData();
             
             // Rechercher la tâche associée à cette date
-            const task = data.find(row => row[0] === dateStr);
-            if (task) {
-                alert(`Tâche pour le ${dateStr} : ${task[1]}`);
+            const taskRow = data.find(row => row[0] === dateStr); // Supposons que la date est dans la première colonne
+            if (taskRow) {
+                alert(`Tâche pour le ${dateStr} : ${taskRow[1]}`); // Affiche la tâche (supposée dans la deuxième colonne)
             } else {
                 alert(`Aucune tâche pour le ${dateStr}.`);
             }
