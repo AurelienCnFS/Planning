@@ -37,9 +37,9 @@
     <p id="selectedText"></p>
 
     <script>
-        const sheetId = '1i9L8f83fnMzIFUVoTJlPtGbylm3Lf8Md7Ph7LkC74nA'; // ID de ta feuille
+        const sheetId = '1i9L8f83fnMzIFUVoTJlPtGbylm3Lf8Md7Ph7LkC74nA'; // ID de la feuille
         const apiKey = 'AIzaSyBYM19vbTPAi49sXzjqPJsFzhRsZHVKql8'; // Clé API
-        const range = 'Feuille1!A:B'; // Modifie si nécessaire
+        const range = 'Feuille1!A:B'; // Plage de données
 
         let events = {}; // Objet pour stocker les événements
 
@@ -54,6 +54,7 @@
                         const [date, text] = data.values[i];
                         events[date] = text; // Utiliser la date comme clé
                     }
+                    console.log('Événements récupérés:', events); // Pour débogage
                 } else {
                     alert('Aucune donnée trouvée.');
                 }
@@ -97,8 +98,8 @@
         }
 
         function selectDate(year, month, day) {
-            // Formater la date pour correspondre au format JJ/MM/AAAA
             const selectedDate = `${day < 10 ? '0' + day : day}/${(month + 1) < 10 ? '0' + (month + 1) : (month + 1)}/${year}`; 
+            console.log('Date sélectionnée:', selectedDate); // Pour débogage
             const text = events[selectedDate] || 'Aucun texte associé pour cette date.'; // Récupérer le texte associé
             document.getElementById('selectedText').textContent = text;
             highlightSelectedDay(day);
