@@ -38,8 +38,8 @@
 
     <script>
         const sheetId = '1i9L8f83fnMzIFUVoTJlPtGbylm3Lf8Md7Ph7LkC74nA'; // ID de ta feuille
-        const apiKey = 'AIzaSyDMdpfkeyCNGeR24WJPiNBj__E64kPrKhE'; // Nouvelle clé API
-        const range = 'Feuille1!A:B'; // Plage de données
+        const apiKey = 'AIzaSyBYM19vbTPAi49sXzjqPJsFzhRsZHVKql8'; // Clé API
+        const range = 'Feuille1!A:B'; // Modifie si nécessaire
 
         let events = {}; // Objet pour stocker les événements
 
