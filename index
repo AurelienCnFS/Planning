@@ -8,9 +8,11 @@
         body {
             text-align: center; /* Centre tout le texte sur la page */
             font-family: Arial, sans-serif; /* Ajoute une police lisible */
+            font-size: 18px; /* Augmente la taille de la police par 3 (taille initiale 6px approximativement) */
         }
         h2 {
             color: #003366; /* Bleu foncé */
+            font-size: 1.5em; /* Réduit la taille de la police du titre de moitié */
         }
         #result {
             margin-top: 20px;
