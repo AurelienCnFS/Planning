@@ -75,7 +75,6 @@
     </script>
 </head>
 <body>
-    <h1>Bienvenue</h1>
     <div id="result">Chargement...</div>
 </body>
 </html>
