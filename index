@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Permanence du jour</title>
+    <title>Permanence numérique du jour</title>
     <style>
+        body {
+            text-align: center; /* Centre tout le texte sur la page */
+            font-family: Arial, sans-serif; /* Ajoute une police lisible */
+        }
         h2 {
             color: #003366; /* Bleu foncé */
+        }
+        #result {
+            margin-top: 20px;
         }
     </style>
     <script>
@@ -40,7 +47,7 @@
                 const permanenceDuJour = entries.find(row => row[0] === today);
 
                 const resultDiv = document.getElementById('result');
-                let resultHTML = `<h2>Permanence du jour</h2>`;
+                let resultHTML = `<h2>Permanence numérique du jour</h2>`;
 
                 if (permanenceDuJour) {
                     // Vérifier si les informations sont vides et ajuster l'affichage en conséquence
@@ -52,7 +59,7 @@
                     if (!village || !heure || !lieu) {
                         resultHTML += "<p>Aucune permanence n'est prévue pour aujourd'hui.</p>";
                     } else {
-                        resultHTML += `
+                        resultHTML += ` 
                             <p>📅 Date : ${permanenceDuJour[0]}</p>
                             <p>🏘️ Village : ${village}</p>
                             <p>⏰ Heure : ${heure}</p>
