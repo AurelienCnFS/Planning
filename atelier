@@ -18,6 +18,9 @@
         #atelier-info {
             margin-top: 20px;
         }
+        .atelier-item {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -36,7 +39,7 @@
 
     <div id="atelier-info">
         <h2>Prochains ateliers :</h2>
-        <ul id="atelier-list"></ul>
+        <div id="atelier-list"></div>
     </div>
 
     <script>
@@ -86,17 +89,18 @@
             // Si un atelier a été trouvé, l'afficher
             if (upcomingAtelier) {
                 const [date, , date2, lieu, thematique] = upcomingAtelier;
-                const listItem = document.createElement('li');
+                const listItem = document.createElement('div');
+                listItem.classList.add('atelier-item');
                 listItem.innerHTML = `
-                    <strong>Date :</strong> ${date} <br>
-                    <strong>Heure :</strong> ${date2} <br>
-                    <strong>Lieu :</strong> ${lieu} <br>
-                    <strong>Thématique :</strong> ${thematique} <br><br>
+                    📅 <strong>${formatDate(date)}</strong> <br>
+                    ⏰ <strong>${date2}</strong> <br>
+                    🏘️ <strong>${lieu}</strong> <br>
+                    🔖 <strong>${thematique}</strong> <br><br>
                 `;
                 atelierList.appendChild(listItem);
             } else {
                 // Aucun atelier à venir pour ce village
-                atelierList.innerHTML = `<li>Aucun atelier à venir pour ${village}.</li>`;
+                atelierList.innerHTML = `<div>Aucun atelier à venir pour ${village}.</div>`;
             }
         }
 
@@ -107,6 +111,20 @@
             const month = parseInt(parts[1], 10) - 1; // Mois commence à 0
             const year = parseInt(parts[2], 10);
             return new Date(year, month, day);
+        }
+
+        // Fonction pour formater la date au format "Jeudi 9 janvier 2025"
+        function formatDate(dateString) {
+            const date = parseDate(dateString);
+            const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const monthsOfYear = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+            const dayOfWeek = daysOfWeek[date.getDay()];
+            const dayOfMonth = date.getDate();
+            const month = monthsOfYear[date.getMonth()];
+            const year = date.getFullYear();
+
+            return `${dayOfWeek} ${dayOfMonth} ${month} ${year}`;
         }
     </script>
 </body>
