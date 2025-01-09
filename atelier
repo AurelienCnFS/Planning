@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ateliers par Village</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #atelier-info {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Choisissez un village pour voir les prochains ateliers :</h1>
+
+    <!-- Boutons pour chaque village -->
+    <button onclick="loadData('Chappes')">Chappes</button>
+    <button onclick="loadData('Courtenot')">Courtenot</button>
+    <button onclick="loadData('Jully-sur-Sarce')">Jully-sur-Sarce</button>
+    <button onclick="loadData('Rumilly-lès-Vaudes')">Rumilly-lès-Vaudes</button>
+    <button onclick="loadData('Saint-Parres-lès-Vaudes')">Saint-Parres-lès-Vaudes</button>
+    <button onclick="loadData('Vaudes')">Vaudes</button>
+    <button onclick="loadData('Villemorien')">Villemorien</button>
+    <button onclick="loadData('Villemoyenne')">Villemoyenne</button>
+    <button onclick="loadData('Virey-sous-Bar')">Virey-sous-Bar</button>
+
+    <div id="atelier-info">
+        <h2>Prochains ateliers :</h2>
+        <ul id="atelier-list"></ul>
+    </div>
+
+    <script>
+        const sheetId = '1YTETTyL4vQtVIylZU39X1p2mjZtBbSmhoo59ouQfE9Q';
+        const apiKey = 'AIzaSyD7eFDdZ36qLTJ6jRSBNea4sAp0j6YAy3Y'; // Votre clé API
+
+        // Fonction pour charger les données de la feuille Google Sheets
+        function loadData(village) {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A:E?key=${apiKey}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur de récupération des données');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayNextAtelier(data.values, village);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                });
+        }
+
+        // Fonction pour afficher le prochain atelier du village sélectionné
+        function displayNextAtelier(values, village) {
+            const atelierList = document.getElementById('atelier-list');
+            atelierList.innerHTML = '';  // Réinitialise la liste avant d'afficher de nouvelles données
+
+            const now = new Date();
+            let upcomingAtelier = null;
+
+            // Parcours des données et recherche du prochain atelier pour le village
+            values.forEach(row => {
+                const [date, villageName, , lieu, thematique] = row;
+                const workshopDate = parseDate(date); // Parse the date properly
+
+                // Si la date de l'atelier est après la date actuelle et que le village correspond
+                if (villageName === village && workshopDate >= now) {
+                    if (!upcomingAtelier || workshopDate < new Date(upcomingAtelier[0])) {
+                        upcomingAtelier = row; // Garde l'atelier avec la date la plus proche
+                    }
+                }
+            });
+
+            // Si un atelier a été trouvé, l'afficher
+            if (upcomingAtelier) {
+                const [date, , date2, lieu, thematique] = upcomingAtelier;
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <strong>Date :</strong> ${date} <br>
+                    <strong>Heure :</strong> ${date2} <br>
+                    <strong>Lieu :</strong> ${lieu} <br>
+                    <strong>Thématique :</strong> ${thematique} <br><br>
+                `;
+                atelierList.appendChild(listItem);
+            } else {
+                // Aucun atelier à venir pour ce village
+                atelierList.innerHTML = `<li>Aucun atelier à venir pour ${village}.</li>`;
+            }
+        }
+
+        // Fonction pour parser les dates au format 'jj/mm/aaaa'
+        function parseDate(dateString) {
+            const parts = dateString.split('/');
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Mois commence à 0
+            const year = parseInt(parts[2], 10);
+            return new Date(year, month, day);
+        }
+    </script>
+</body>
+</html>
