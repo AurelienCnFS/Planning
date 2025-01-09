@@ -6,16 +6,46 @@
     <title>Permanence numérique du jour</title>
     <style>
         body {
-            text-align: center; /* Centre tout le texte sur la page */
-            font-family: Arial, sans-serif; /* Ajoute une police lisible */
-            font-size: 18px; /* Augmente la taille de la police par 3 (taille initiale 6px approximativement) */
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            margin: 0;
+            padding: 0;
+            background-color: white; /* Arrière-plan blanc */
         }
-        h2 {
-            color: #003366; /* Bleu foncé */
-            font-size: 1.5em; /* Réduit la taille de la police du titre de moitié */
+        h1 {
+            background-color: #003366;
+            color: white;
+            margin: 0;
+            padding: 10px;
+            font-size: 1em; /* Taille réduite de moitié */
+        }
+        h2, h3 {
+            color: #003366;
+            margin: 10px 0;
         }
         #result {
-            margin-top: 20px;
+            background: white;
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 600px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .info-block {
+            border: 1px solid #003366;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+        .info-block p {
+            margin: 8px 0;
+        }
+        .no-data {
+            color: red;
+            font-weight: bold;
+            margin-top: 15px;
         }
     </style>
     <script>
@@ -24,10 +54,8 @@
         const RANGE = 'A:D';
 
         async function fetchPlanning() {
-            // Obtenir la date actuelle au format JJ/MM/AAAA
-            const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-            console.log("Date actuelle :", today);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
             try {
@@ -42,34 +70,41 @@
                     return;
                 }
 
-                // Parcourir les données pour trouver la permanence du jour
-                const headers = rows[0]; // En-têtes
-                const entries = rows.slice(1); // Données sans en-têtes
+                const headers = rows[0];
+                const entries = rows.slice(1);
 
-                const permanenceDuJour = entries.find(row => row[0] === today);
+                const permanenceDuJour = entries.find(row => {
+                    const date = parseDate(row[0]);
+                    return date && date.getTime() === today.getTime();
+                });
 
                 const resultDiv = document.getElementById('result');
-                let resultHTML = `<h2>Permanence numérique du jour</h2>`;
+                let resultHTML = ``;
 
                 if (permanenceDuJour) {
-                    // Vérifier si les informations sont vides et ajuster l'affichage en conséquence
-                    const village = permanenceDuJour[1];
-                    const heure = permanenceDuJour[2];
-                    const lieu = permanenceDuJour[3];
+                    const [date, village, heure, lieu] = permanenceDuJour;
 
-                    // Si une des valeurs est vide, afficher "Aucune permanence n'est prévue pour aujourd'hui"
-                    if (!village || !heure || !lieu) {
-                        resultHTML += "<p>Aucune permanence n'est prévue pour aujourd'hui.</p>";
+                    if (village && heure && lieu) {
+                        resultHTML += `
+                            <div class="info-block">
+                                <h3>Permanence du jour</h3>
+                                <p>📅 <strong>Date :</strong> ${date}</p>
+                                <p>🏘️ <strong>Village :</strong> ${village}</p>
+                                <p>⏰ <strong>Heure :</strong> ${heure}</p>
+                                <p>📍 <strong>Lieu :</strong> ${lieu}</p>
+                            </div>
+                        `;
                     } else {
-                        resultHTML += ` 
-                            <p>📅 Date : ${permanenceDuJour[0]}</p>
-                            <p>🏘️ Village : ${village}</p>
-                            <p>⏰ Heure : ${heure}</p>
-                            <p>📍 Lieu : ${lieu}</p>
+                        resultHTML += `
+                            <p class="no-data">Aucune permanence prévue ce jour.</p>
+                            ${getNextPermanence(entries, today)}
                         `;
                     }
                 } else {
-                    resultHTML += "<p>Aucune permanence n'est prévue pour aujourd'hui.</p>";
+                    resultHTML += `
+                        <p class="no-data">Aucune permanence prévue ce jour.</p>
+                        ${getNextPermanence(entries, today)}
+                    `;
                 }
 
                 resultDiv.innerHTML = resultHTML;
@@ -80,10 +115,38 @@
             }
         }
 
+        function getNextPermanence(entries, today) {
+            const nextPermanence = entries
+                .map(row => ({ date: parseDate(row[0]), details: row }))
+                .filter(entry => entry.date && entry.date > today && entry.details[1] && entry.details[2] && entry.details[3])
+                .sort((a, b) => a.date - b.date)[0];
+
+            if (nextPermanence) {
+                const [nextDate, nextVillage, nextHeure, nextLieu] = nextPermanence.details;
+                return `
+                    <div class="info-block">
+                        <h3>Prochaine permanence</h3>
+                        <p>📅 <strong>Date :</strong> ${nextDate}</p>
+                        <p>🏘️ <strong>Village :</strong> ${nextVillage}</p>
+                        <p>⏰ <strong>Heure :</strong> ${nextHeure}</p>
+                        <p>📍 <strong>Lieu :</strong> ${nextLieu}</p>
+                    </div>
+                `;
+            }
+            return "<p>Aucune permanence à venir.</p>";
+        }
+
+        function parseDate(dateString) {
+            if (!dateString) return null;
+            const [day, month, year] = dateString.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
         window.onload = fetchPlanning;
     </script>
 </head>
 <body>
+    <h1>Permanence numérique du jour</h1>
     <div id="result">Chargement...</div>
 </body>
 </html>
