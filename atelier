@@ -3,42 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ateliers par Village</title>
+    <title>Atelier par Village</title>
     <style>
+        /* Style de base */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
+
+        h1 {
+            text-align: center;
+            color: #003366; /* Titre en bleu foncé */
+            font-size: 16px; /* Taille du titre réduite de 30% */
+            margin: 0; /* Aucune marge, pas d'espace supplémentaire */
+        }
+
+        /* Style des boutons */
         button {
-            padding: 10px;
+            padding: 10px 15px; /* Boutons plus petits */
+            font-size: 14px; /* Taille de police réduite */
             margin: 5px;
-            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007BFF;
+            color: white;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Conteneur des informations d'atelier */
         #atelier-info {
-            margin-top: 20px;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ffffff; /* Arrière-plan blanc */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
         }
+
+        #atelier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         .atelier-item {
-            margin-bottom: 10px;
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style pour les icônes et informations */
+        .atelier-item strong {
+            font-size: 16px;
+        }
+
+        .atelier-item span {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Style d'affichage quand aucun atelier n'est trouvé */
+        #atelier-list div {
+            color: #FF6F61;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* Espace entre le titre et les boutons */
+        .button-container {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Choisissez un village pour voir les prochains ateliers :</h1>
+    <!-- Titre de la page -->
+    <h1 id="instruction-text">Choisissez un village pour voir le prochain atelier disponible :</h1>
 
     <!-- Boutons pour chaque village -->
-    <button onclick="loadData('Chappes')">Chappes</button>
-    <button onclick="loadData('Courtenot')">Courtenot</button>
-    <button onclick="loadData('Jully-sur-Sarce')">Jully-sur-Sarce</button>
-    <button onclick="loadData('Rumilly-lès-Vaudes')">Rumilly-lès-Vaudes</button>
-    <button onclick="loadData('Saint-Parres-lès-Vaudes')">Saint-Parres-lès-Vaudes</button>
-    <button onclick="loadData('Vaudes')">Vaudes</button>
-    <button onclick="loadData('Villemorien')">Villemorien</button>
-    <button onclick="loadData('Villemoyenne')">Villemoyenne</button>
-    <button onclick="loadData('Virey-sous-Bar')">Virey-sous-Bar</button>
+    <div class="button-container" style="display: flex; flex-wrap: wrap; justify-content: center;" id="button-container">
+        <button onclick="loadData('Chappes')">Chappes</button>
+        <button onclick="loadData('Courtenot')">Courtenot</button>
+        <button onclick="loadData('Jully-sur-Sarce')">Jully-sur-Sarce</button>
+        <button onclick="loadData('Rumilly-lès-Vaudes')">Rumilly-lès-Vaudes</button>
+        <button onclick="loadData('Saint-Parres-lès-Vaudes')">Saint-Parres-lès-Vaudes</button>
+        <button onclick="loadData('Vaudes')">Vaudes</button>
+        <button onclick="loadData('Villemorien')">Villemorien</button>
+        <button onclick="loadData('Villemoyenne')">Villemoyenne</button>
+        <button onclick="loadData('Virey-sous-Bar')">Virey-sous-Bar</button>
+    </div>
 
+    <!-- Conteneur des résultats -->
     <div id="atelier-info">
-        <h2>Prochains ateliers :</h2>
+        <h2 id="atelier-title" style="display: none;">Prochain atelier :</h2>
         <div id="atelier-list"></div>
     </div>
 
@@ -59,10 +128,22 @@
                 })
                 .then(data => {
                     displayNextAtelier(data.values, village);
+                    hideButtons();  // Masque les boutons après le clic
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
                 });
+        }
+
+        // Fonction pour masquer les boutons
+        function hideButtons() {
+            const buttonContainer = document.getElementById('button-container');
+            const instructionText = document.getElementById('instruction-text');
+            const atelierTitle = document.getElementById('atelier-title');
+            
+            buttonContainer.style.display = 'none';  // Cache le conteneur de boutons
+            instructionText.style.display = 'none';  // Cache le texte d'instruction
+            atelierTitle.style.display = 'block';  // Affiche le titre "Prochain atelier"
         }
 
         // Fonction pour afficher le prochain atelier du village sélectionné
@@ -91,7 +172,7 @@
                 const [date, , date2, lieu, thematique] = upcomingAtelier;
                 const listItem = document.createElement('div');
                 listItem.classList.add('atelier-item');
-                listItem.innerHTML = `
+                listItem.innerHTML = ` 
                     📅 <strong>${formatDate(date)}</strong> <br>
                     ⏰ <strong>${date2}</strong> <br>
                     🏘️ <strong>${lieu}</strong> <br>
