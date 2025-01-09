@@ -86,6 +86,21 @@
         .button-container {
             margin-top: 20px;
         }
+
+        /* Style du bouton retour */
+        #return-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #return-button:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +124,7 @@
     <div id="atelier-info">
         <h2 id="atelier-title" style="display: none;">Prochain atelier :</h2>
         <div id="atelier-list"></div>
+        <button id="return-button" onclick="showButtons()" style="display: none;">Retour</button>
     </div>
 
     <script>
@@ -140,10 +156,27 @@
             const buttonContainer = document.getElementById('button-container');
             const instructionText = document.getElementById('instruction-text');
             const atelierTitle = document.getElementById('atelier-title');
+            const returnButton = document.getElementById('return-button');
             
             buttonContainer.style.display = 'none';  // Cache le conteneur de boutons
             instructionText.style.display = 'none';  // Cache le texte d'instruction
             atelierTitle.style.display = 'block';  // Affiche le titre "Prochain atelier"
+            returnButton.style.display = 'block';  // Affiche le bouton retour
+        }
+
+        // Fonction pour réafficher les boutons et cacher les résultats
+        function showButtons() {
+            const buttonContainer = document.getElementById('button-container');
+            const instructionText = document.getElementById('instruction-text');
+            const atelierTitle = document.getElementById('atelier-title');
+            const atelierList = document.getElementById('atelier-list');
+            const returnButton = document.getElementById('return-button');
+
+            buttonContainer.style.display = 'flex';  // Réaffiche le conteneur de boutons
+            instructionText.style.display = 'block';  // Réaffiche le texte d'instruction
+            atelierTitle.style.display = 'none';  // Cache le titre "Prochain atelier"
+            atelierList.innerHTML = '';  // Vide les résultats précédents
+            returnButton.style.display = 'none';  // Cache le bouton retour
         }
 
         // Fonction pour afficher le prochain atelier du village sélectionné
