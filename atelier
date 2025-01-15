@@ -3,113 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier par Village</title>
+    <title>Ateliers Numériques Itinérants</title>
     <style>
-        /* Style de base */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             flex-direction: column;
+            align-items: center;
+            background-color: white; /* Suppression du fond gris */
+            min-height: 100vh;
+            justify-content: center;
         }
-
         h1 {
             text-align: center;
-            color: #003366; /* Titre en bleu foncé */
-            font-size: 16px; /* Taille du titre réduite de 30% */
-            margin: 0; /* Aucune marge, pas d'espace supplémentaire */
+            font-size: 1.5rem;
+            margin: 20px;
+            color: #333;
         }
-
-        /* Style des boutons */
+        #button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
         button {
-            padding: 10px 15px; /* Boutons plus petits */
-            font-size: 14px; /* Taille de police réduite */
             margin: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
+            cursor: pointer;
             background-color: #007BFF;
             color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
         }
-
         button:hover {
             background-color: #0056b3;
         }
-
-        /* Conteneur des informations d'atelier */
         #atelier-info {
-            margin-top: 30px;
+            display: none;
+            text-align: center;
+            margin: 20px;
             padding: 20px;
-            background-color: #ffffff; /* Arrière-plan blanc */
+            background: white;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            width: 80%;
+            width: 90%;
             max-width: 600px;
         }
-
-        #atelier-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
         .atelier-item {
-            background-color: #e9f7ef;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
-            white-space: pre-line; /* Permet le retour à la ligne */
-        }
-
-        /* Style pour les icônes et informations */
-        .atelier-item strong {
-            font-size: 16px;
-        }
-
-        .atelier-item span {
-            font-size: 14px;
+            margin: 10px 0;
+            font-size: 1rem;
             color: #555;
+            line-height: 1.6;
         }
-
-        /* Style d'affichage quand aucun atelier n'est trouvé */
-        #atelier-list div {
-            color: #FF6F61;
-            text-align: center;
-            font-size: 18px;
+        strong {
+            color: #333;
         }
-
-        /* Espace entre le titre et les boutons */
-        .button-container {
-            margin-top: 20px;
-        }
-
-        /* Style du bouton retour */
         #return-button {
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #28a745;
+            background-color: #4CAF50;
             color: white;
-            border-radius: 8px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
             cursor: pointer;
-            font-size: 14px;
+            transition: background-color 0.3s;
         }
-
         #return-button:hover {
-            background-color: #218838;
+            background-color: #45a049;
+        }
+        /* Ajout pour aligner les deux lignes */
+        .aligned-text {
+            white-space: pre-line; /* Permet de respecter les sauts de ligne */
+            text-align: left; /* Aligne le contenu des deux lignes à gauche */
         }
     </style>
 </head>
 <body>
-    <!-- Titre de la page -->
-    <h1 id="instruction-text">Choisissez un village pour voir le prochain atelier disponible :</h1>
-
-    <!-- Boutons pour chaque village -->
-    <div class="button-container" style="display: flex; flex-wrap: wrap; justify-content: center;" id="button-container">
+    <h1 id="main-title">Choisissez un village pour voir le prochain atelier disponible :</h1>
+    <div id="button-container">
         <button onclick="loadData('Chappes')">Chappes</button>
         <button onclick="loadData('Courtenot')">Courtenot</button>
         <button onclick="loadData('Jully-sur-Sarce')">Jully-sur-Sarce</button>
@@ -120,126 +96,77 @@
         <button onclick="loadData('Villemoyenne')">Villemoyenne</button>
         <button onclick="loadData('Virey-sous-Bar')">Virey-sous-Bar</button>
     </div>
-
-    <!-- Conteneur des résultats -->
     <div id="atelier-info">
-        <h2 id="atelier-title" style="display: none;">Prochain atelier :</h2>
         <div id="atelier-list"></div>
-        <button id="return-button" onclick="showButtons()" style="display: none;">Retour</button>
+        <button id="return-button" onclick="showButtons()">Retour</button>
     </div>
 
     <script>
         const sheetId = '1YTETTyL4vQtVIylZU39X1p2mjZtBbSmhoo59ouQfE9Q';
-        const apiKey = 'AIzaSyD7eFDdZ36qLTJ6jRSBNea4sAp0j6YAy3Y'; // Votre clé API
+        const apiKey = 'AIzaSyD7eFDdZ36qLTJ6jRSBNea4sAp0j6YAy3Y';
 
-        // Fonction pour charger les données de la feuille Google Sheets
         function loadData(village) {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A:E?key=${apiKey}`;
+            const title = document.getElementById('main-title');
 
             fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erreur de récupération des données');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    displayNextAtelier(data.values, village);
-                    hideButtons();  // Masque les boutons après le clic
+                    displayNextOrTodayAtelier(data.values, village);
+                    document.getElementById('button-container').style.display = 'none';
+                    document.getElementById('atelier-info').style.display = 'block';
+                    title.textContent = 'Prochain Atelier :'; // Change le titre
                 })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                });
+                .catch(error => console.error('Erreur:', error));
         }
 
-        // Fonction pour masquer les boutons
-        function hideButtons() {
-            const buttonContainer = document.getElementById('button-container');
-            const instructionText = document.getElementById('instruction-text');
-            const atelierTitle = document.getElementById('atelier-title');
-            const returnButton = document.getElementById('return-button');
-            
-            buttonContainer.style.display = 'none';  // Cache le conteneur de boutons
-            instructionText.style.display = 'none';  // Cache le texte d'instruction
-            atelierTitle.style.display = 'block';  // Affiche le titre "Prochain atelier"
-            returnButton.style.display = 'block';  // Affiche le bouton retour
-        }
-
-        // Fonction pour réafficher les boutons et cacher les résultats
-        function showButtons() {
-            const buttonContainer = document.getElementById('button-container');
-            const instructionText = document.getElementById('instruction-text');
-            const atelierTitle = document.getElementById('atelier-title');
+        function displayNextOrTodayAtelier(rows, village) {
             const atelierList = document.getElementById('atelier-list');
-            const returnButton = document.getElementById('return-button');
-
-            buttonContainer.style.display = 'flex';  // Réaffiche le conteneur de boutons
-            instructionText.style.display = 'block';  // Réaffiche le texte d'instruction
-            atelierTitle.style.display = 'none';  // Cache le titre "Prochain atelier"
-            atelierList.innerHTML = '';  // Vide les résultats précédents
-            returnButton.style.display = 'none';  // Cache le bouton retour
-        }
-
-        // Fonction pour afficher le prochain atelier du village sélectionné
-        function displayNextAtelier(values, village) {
-            const atelierList = document.getElementById('atelier-list');
-            atelierList.innerHTML = '';  // Réinitialise la liste avant d'afficher de nouvelles données
+            atelierList.innerHTML = '';
 
             const now = new Date();
-            let upcomingAtelier = null;
+            const today = new Date(now.setHours(0, 0, 0, 0));
+            let nextAtelier = null;
 
-            // Parcours des données et recherche du prochain atelier pour le village
-            values.forEach(row => {
-                const [date, villageName, , lieu, thematique] = row;
-                const workshopDate = parseDate(date); // Parse the date properly
+            rows.forEach(row => {
+                const [date, villageName, heure, lieu, thematique] = row;
+                const workshopDate = parseDate(date);
 
-                // Si la date de l'atelier est après la date actuelle et que le village correspond
-                if (villageName === village && workshopDate >= now) {
-                    if (!upcomingAtelier || workshopDate < new Date(upcomingAtelier[0])) {
-                        upcomingAtelier = row; // Garde l'atelier avec la date la plus proche
+                if (villageName === village) {
+                    if (workshopDate.getTime() === today.getTime()) {
+                        nextAtelier = { date, heure, lieu, thematique };
+                    } else if (!nextAtelier && workshopDate > today) {
+                        nextAtelier = { date, heure, lieu, thematique };
                     }
                 }
             });
 
-            // Si un atelier a été trouvé, l'afficher
-            if (upcomingAtelier) {
-                const [date, , date2, lieu, thematique] = upcomingAtelier;
-                const listItem = document.createElement('div');
-                listItem.classList.add('atelier-item');
-                listItem.innerHTML = ` 
-                    📅 <strong>${formatDate(date)}</strong> <br>
-                    ⏰ <strong>${date2}</strong> <br>
-                    🏘️ <strong>${lieu}</strong> <br>
-                    🔖 <strong>${thematique}</strong> <br><br>
+            if (nextAtelier) {
+                const formattedHeure = nextAtelier.heure.replace(/\n/g, '<br>'); // Respect des sauts de ligne
+                const item = document.createElement('div');
+                item.classList.add('atelier-item');
+                item.innerHTML = `
+                    📅 <strong>Date :</strong> ${nextAtelier.date}<br>
+                    ⏰ <strong>Heure :</strong> <span class="aligned-text">${formattedHeure}</span><br>
+                    🏘️ <strong>Lieu :</strong> ${nextAtelier.lieu}<br>
+                    🔖 <strong>Thématique :</strong> ${nextAtelier.thematique}
                 `;
-                atelierList.appendChild(listItem);
+                atelierList.appendChild(item);
             } else {
-                // Aucun atelier à venir pour ce village
                 atelierList.innerHTML = `<div>Aucun atelier à venir pour ${village}.</div>`;
             }
         }
 
-        // Fonction pour parser les dates au format 'jj/mm/aaaa'
         function parseDate(dateString) {
             const parts = dateString.split('/');
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Mois commence à 0
-            const year = parseInt(parts[2], 10);
-            return new Date(year, month, day);
+            return new Date(parts[2], parts[1] - 1, parts[0]);
         }
 
-        // Fonction pour formater la date au format "Jeudi 9 janvier 2025"
-        function formatDate(dateString) {
-            const date = parseDate(dateString);
-            const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-            const monthsOfYear = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-
-            const dayOfWeek = daysOfWeek[date.getDay()];
-            const dayOfMonth = date.getDate();
-            const month = monthsOfYear[date.getMonth()];
-            const year = date.getFullYear();
-
-            return `${dayOfWeek} ${dayOfMonth} ${month} ${year}`;
+        function showButtons() {
+            const title = document.getElementById('main-title');
+            document.getElementById('button-container').style.display = 'flex';
+            document.getElementById('atelier-info').style.display = 'none';
+            title.textContent = 'Choisissez un village pour voir le prochain atelier disponible :'; // Rétablit le titre original
         }
     </script>
 </body>
