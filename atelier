@@ -12,9 +12,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: white; /* Suppression du fond gris */
+            background-color: white;
             min-height: 100vh;
-            justify-content: center;
+            justify-content: flex-start; /* Alignement en haut */
         }
         h1 {
             text-align: center;
@@ -52,6 +52,8 @@
             border-radius: 10px;
             width: 90%;
             max-width: 600px;
+            max-height: 100vh; /* Limite la hauteur à 100% de la fenêtre */
+            overflow-y: auto; /* Permet de scroller si nécessaire */
         }
         .atelier-item {
             margin: 10px 0;
@@ -76,10 +78,9 @@
         #return-button:hover {
             background-color: #45a049;
         }
-        /* Ajout pour aligner les deux lignes */
         .aligned-text {
-            white-space: pre-line; /* Permet de respecter les sauts de ligne */
-            text-align: left; /* Aligne le contenu des deux lignes à gauche */
+            white-space: pre-line;
+            text-align: left;
         }
     </style>
 </head>
@@ -115,7 +116,7 @@
                     displayNextOrTodayAtelier(data.values, village);
                     document.getElementById('button-container').style.display = 'none';
                     document.getElementById('atelier-info').style.display = 'block';
-                    title.textContent = 'Prochain Atelier :'; // Change le titre
+                    title.textContent = 'Prochain Atelier :'; 
                 })
                 .catch(error => console.error('Erreur:', error));
         }
@@ -142,7 +143,7 @@
             });
 
             if (nextAtelier) {
-                const formattedHeure = nextAtelier.heure.replace(/\n/g, '<br>'); // Respect des sauts de ligne
+                const formattedHeure = nextAtelier.heure.replace(/\n/g, '<br>'); 
                 const item = document.createElement('div');
                 item.classList.add('atelier-item');
                 item.innerHTML = `
@@ -166,7 +167,7 @@
             const title = document.getElementById('main-title');
             document.getElementById('button-container').style.display = 'flex';
             document.getElementById('atelier-info').style.display = 'none';
-            title.textContent = 'Choisissez un village pour voir le prochain atelier disponible :'; // Rétablit le titre original
+            title.textContent = 'Choisissez un village pour voir le prochain atelier disponible :'; 
         }
     </script>
 </body>
