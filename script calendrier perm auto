@@ -1,0 +1,117 @@
+function genererCalendrierMensuelSansWeekends() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var feuilleSource = ss.getSheetByName('Feuille 1');
+  if (!feuilleSource) {
+    SpreadsheetApp.getUi().alert('La feuille "Feuille 1" est introuvable.');
+    return;
+  }
+
+  var ui = SpreadsheetApp.getUi();
+  var reponse = ui.prompt('Générer le calendrier', 'Veuillez entrer le mois et l\'année au format MM/YYYY :', ui.ButtonSet.OK_CANCEL);
+  if (reponse.getSelectedButton() != ui.Button.OK) {
+    return;
+  }
+
+  var saisie = reponse.getResponseText();
+  var datePattern = /^(\d{2})\/(\d{4})$/;
+  var dateMatch = saisie.match(datePattern);
+  if (!dateMatch) {
+    ui.alert('Format invalide. Veuillez entrer le mois et l\'année au format MM/YYYY.');
+    return;
+  }
+
+  var mois = parseInt(dateMatch[1], 10);
+  var annee = parseInt(dateMatch[2], 10);
+  if (mois < 1 || mois > 12) {
+    ui.alert('Mois invalide. Veuillez entrer un mois entre 01 et 12.');
+    return;
+  }
+
+  var nomFeuilleCalendrier = 'Calendrier ' + saisie;
+  var feuilleCalendrier = ss.getSheetByName(nomFeuilleCalendrier);
+  if (feuilleCalendrier) {
+    feuilleCalendrier.clear();
+  } else {
+    feuilleCalendrier = ss.insertSheet(nomFeuilleCalendrier);
+  }
+
+  var joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+  for (var i = 0; i < joursSemaine.length; i++) {
+    feuilleCalendrier.getRange(1, i + 1).setValue(joursSemaine[i])
+      .setFontWeight('bold')
+      .setFontSize(13)
+      .setHorizontalAlignment('center')
+      .setBackground('#d9e1f2');
+  }
+
+  var donnees = feuilleSource.getDataRange().getValues();
+  var evenements = [];
+  for (var i = 1; i < donnees.length; i++) {
+    var date = new Date(donnees[i][0]);
+    if (date.getMonth() + 1 === mois && date.getFullYear() === annee) {
+      evenements.push({
+        jour: date.getDate(),
+        commune: donnees[i][1],
+        horaire: donnees[i][2],
+        lieu: donnees[i][3]
+      });
+    }
+  }
+
+  function getISOWeek(date) {
+    var target = new Date(date.valueOf());
+    var dayNr = (date.getDay() + 6) % 7;
+    target.setDate(target.getDate() - dayNr + 3);
+    var firstThursday = target.valueOf();
+    target.setMonth(0, 1);
+    if (target.getDay() !== 4) {
+      target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+    }
+    return 1 + Math.ceil((firstThursday - target) / 604800000);
+  }
+
+  var premierJour = new Date(annee, mois - 1, 1);
+  var dernierJour = new Date(annee, mois, 0);
+  var nbJours = dernierJour.getDate();
+  var jourSemainePremier = premierJour.getDay();
+  if (jourSemainePremier === 0) jourSemainePremier = 7;
+  if (jourSemainePremier > 5) jourSemainePremier = 1;
+  
+  var colonne = jourSemainePremier - 1;
+  var ligne = 2;
+  
+  for (var jour = 1; jour <= nbJours; jour++) {
+    var dateActuelle = new Date(annee, mois - 1, jour);
+    var jourSemaine = dateActuelle.getDay();
+    if (jourSemaine === 0 || jourSemaine === 6) continue;
+
+    var celluleJour = feuilleCalendrier.getRange(ligne, colonne + 1);
+    celluleJour.setValue(jour).setFontSize(13).setFontWeight('bold').setHorizontalAlignment('right').setVerticalAlignment('middle');
+
+    var details = evenements.filter(e => e.jour === jour);
+    if (details.length > 0) {
+      var evenementTexte = details[0].commune + '\n' + details[0].horaire + '\n' + details[0].lieu;
+      var celluleEvenement = feuilleCalendrier.getRange(ligne + 1, colonne + 1);
+      celluleEvenement.setValue(evenementTexte).setFontSize(13).setHorizontalAlignment('center').setVerticalAlignment('middle');
+      feuilleCalendrier.setRowHeight(ligne + 1, 90);
+    }
+
+    var semainePair = getISOWeek(dateActuelle) % 2 === 0;
+    var couleurFondJour = semainePair ? '#b9e47b' : '#ffaf5f';
+    celluleJour.setBackground(couleurFondJour);
+
+    celluleJour.setBorder(true, true, false, true, true, true);
+    feuilleCalendrier.getRange(ligne + 1, colonne + 1).setBorder(true, true, true, true, true, true);
+
+    colonne++;
+    if (colonne > 4) {
+      colonne = 0;
+      ligne += 2;
+    }
+  }
+
+  feuilleCalendrier.getRange(1, 1, ligne - 1, 5).setBorder(true, true, true, true, true, true);
+  feuilleCalendrier.setColumnWidths(1, 5, 200);
+  feuilleCalendrier.getDataRange().setVerticalAlignment('middle').setWrap(true);
+  feuilleCalendrier.setFrozenRows(1);
+}
